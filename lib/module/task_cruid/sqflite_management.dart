@@ -1,10 +1,12 @@
 part of './task_cruid.dart';
 
-class SqfliteCRUID {
+class SqfliteManagement {
   Database? _database;
 
   Database getDb() {
-    assert(_database != null, "Please call openDb first");
+    if (_database == null) {
+      throw SQLError("Database is not connected, please call openDb first");
+    }
     return _database!;
   }
 
@@ -15,7 +17,7 @@ class SqfliteCRUID {
       return;
     }
     var db = await openDatabase(
-      join(await getDatabasesPath(), "app_db.db"),
+      env.isTesting ? inMemoryDatabasePath : join(await getDatabasesPath(), "app_db.db"),
       version: 1,
       onOpen: onOpened,
     );
@@ -23,9 +25,9 @@ class SqfliteCRUID {
   }
 }
 
-class SQLError {
+class SQLError extends Error {
   final String message;
   final int? code;
 
-  SQLError(this.message, this.code);
+  SQLError(this.message, [this.code]);
 }

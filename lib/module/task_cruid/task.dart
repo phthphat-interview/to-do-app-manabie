@@ -1,6 +1,6 @@
 part of './task_cruid.dart';
 
-class Task {
+class Task extends Equatable {
   int id; //-1 is for creating
   String title;
   String? description;
@@ -25,6 +25,10 @@ class Task {
       'isDone': status.value,
     };
   }
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [id, title, description, status];
 }
 
 enum TaskStatus { done, notDone }
