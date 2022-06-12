@@ -3,6 +3,8 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:todo_manabie/module/di/di.dart';
 import 'package:todo_manabie/module/environment/environment_manager.dart';
+import 'package:todo_manabie/screen/home/sub_screen/task_screen_type.dart';
+import 'package:todo_manabie/screen/home/sub_screen/task_type_screen.dart';
 
 part 'sqflite_management.dart';
 part './task.dart';
@@ -19,7 +21,8 @@ class TaskCRUID {
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
             title TEXT NOT NULL,
             description TEXT, 
-            isDone INTEGER DEFAULT ${TaskStatus.notDone.value}
+            status INTEGER DEFAULT ${TaskStatus.notDone.value},
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
           );
           """,
         );
@@ -58,10 +61,13 @@ class TaskCRUID {
   }
 
   Future<Task> update(Task task) async {
+    var data = task.toJson();
+    data["timestamp"] = "CURRENT_TIMESTAMP";
+
     assert(task.id != -1, "Task id must not be -1");
     final rowChange = await _sqfliteCRUID.getDb().update(
       "task",
-      task.toJson(),
+      data,
       where: "id = ?",
       whereArgs: [task.id],
     );
@@ -73,19 +79,16 @@ class TaskCRUID {
 
   Future<Task> updateCustomCol(int id, Map<String, dynamic> data) async {
     assert(data["id"] != -1, "Task id must not be -1");
-    await _sqfliteCRUID.getDb().update(
-      "task",
-      data,
-      where: "id = ?",
-      whereArgs: [id],
-    );
+    var cloneData = {...data};
+    cloneData["timestamp"] = "CURRENT_TIMESTAMP";
+    await _sqfliteCRUID.getDb().update("task", cloneData, where: "id = ?", whereArgs: [id]);
     return (await getById(id))!;
   }
 
   Future<Task?> getById(int id) async {
     final List<Map<String, dynamic>> maps = await _sqfliteCRUID.getDb().query(
           "task",
-          columns: ["id", "title", "description", "isDone"],
+          columns: ["id", "title", "description", "status"],
           where: "id = ?",
           whereArgs: [id],
           limit: 1,
@@ -96,9 +99,14 @@ class TaskCRUID {
     return Task.fromJson(maps.first);
   }
 
-  Future<List<Task>> getAll() async {
-    final List<Map<String, dynamic>> maps =
-        await _sqfliteCRUID.getDb().query("task", columns: ["id", "title", "description", "isDone"]);
+  Future<List<Task>> getAll([TaskScreenType filter = TaskScreenType.all]) async {
+    final List<Map<String, dynamic>> maps = await _sqfliteCRUID.getDb().query(
+          "task",
+          columns: ["id", "title", "description", "status"],
+          orderBy: "timestamp DESC",
+          where: filter == TaskScreenType.all ? null : "status = ?",
+          whereArgs: filter.taskStatus == null ? null : [filter.taskStatus?.value],
+        );
     return maps.map(Task.fromJson).toList();
   }
 

@@ -45,7 +45,7 @@ class _TaskCreationPopUpState extends State<TaskCreationPopUp> {
           Text(
             widget.purpose == ViewTaskPurpose.create ? "Task creation" : "Task edit",
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 24),
+            style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold, fontSize: 20),
           ),
           const SizedBox(height: 10),
           TextField(

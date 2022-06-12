@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:todo_manabie/module/task_cruid/task_cruid.dart';
 
 enum TaskScreenType { all, done, notDone }
 
 extension TaskScreenTypeExt on TaskScreenType {
+  TaskStatus? get taskStatus {
+    switch (this) {
+      case TaskScreenType.all:
+        return null;
+      case TaskScreenType.notDone:
+        return TaskStatus.notDone;
+      case TaskScreenType.done:
+        return TaskStatus.done;
+    }
+  }
+
   String get tabName {
     switch (this) {
       case TaskScreenType.all:
@@ -10,7 +22,7 @@ extension TaskScreenTypeExt on TaskScreenType {
       case TaskScreenType.done:
         return 'Completed';
       case TaskScreenType.notDone:
-        return 'Incompleted';
+        return 'Incomplete';
     }
   }
 

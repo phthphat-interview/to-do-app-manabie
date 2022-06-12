@@ -6,6 +6,8 @@ class Task extends Equatable {
   String? description;
   TaskStatus status;
 
+  static String statusCol = "status";
+
   Task({this.id = -1, required this.title, this.description, this.status = TaskStatus.notDone});
 
   static Task fromJson(Map<String, dynamic> json) {
@@ -13,7 +15,7 @@ class Task extends Equatable {
       id: json["id"],
       title: json["title"],
       description: json["description"],
-      status: TaskStatusExt.fromValue(json["isDone"]),
+      status: TaskStatusExt.fromValue(json["status"]),
     );
   }
 
@@ -22,12 +24,11 @@ class Task extends Equatable {
       if (id != -1) 'id': id,
       'title': title,
       'description': description,
-      'isDone': status.value,
+      'status': status.value,
     };
   }
 
   @override
-  // TODO: implement props
   List<Object?> get props => [id, title, description, status];
 }
 
@@ -40,6 +41,15 @@ extension TaskStatusExt on TaskStatus {
         return 1;
       case TaskStatus.notDone:
         return 0;
+    }
+  }
+
+  String get text {
+    switch (this) {
+      case TaskStatus.done:
+        return "Complete";
+      case TaskStatus.notDone:
+        return "Incomplete";
     }
   }
 

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_manabie/screen/home/bloc/home_bloc.dart';
+import 'package:todo_manabie/screen/home/popup/home_popup.dart';
 import 'package:todo_manabie/screen/home/sub_screen/task_screen_type.dart';
+import 'package:todo_manabie/screen/home/sub_screen/view/task_item_cell.dart';
 import 'package:todo_manabie/view/view.dart';
 
 import '../../../module/task_cruid/task_cruid.dart';
@@ -20,17 +22,57 @@ class _TaskTypeScreenState extends State<TaskTypeScreen> with AutomaticKeepAlive
 
   List<Task> _taskList = [];
 
+  late final _bloc = BlocProvider.of<HomeBloc>(context);
+
   @override
   void initState() {
     super.initState();
-    print("init state");
+    _bloc.getTaskList(widget.type).then((value) {
+      _taskList = value;
+      for (var _ in _taskList) {
+        _animatedList?.insertItem(0);
+      }
+    });
+  }
+
+  void _onToggleCheckBox(Task task) async {
+    final isConfirm = await HomePopup.confirmChangeTaskStatus(context, task.status);
+    if (isConfirm == true) _bloc.add(TaskTypeChangeEvent(task));
+  }
+
+  void _onReceiveTaskChangeState(TaskTypeChangeState state) {
+    final index = _taskList.indexWhere((task) => task.id == state.task.id);
+    if (widget.type == TaskScreenType.all) {
+      //update ui if here is all
+
+      if (index != -1) {
+        _taskList.removeAt(index);
+        _animatedList?.removeItem(index, (context, animation) => SizedBox());
+        _taskList.insert(0, state.task);
+        _animatedList?.insertItem(0);
+      }
+      return;
+    }
+    if (widget.type.taskStatus != state.task.status) {
+      //status change from here to other
+      if (index != -1) {
+        _taskList.removeAt(index);
+        _animatedList?.removeItem(index, (context, animation) => SizedBox());
+      }
+      return;
+    }
+    if (widget.type.taskStatus == state.task.status) {
+      //status change from other to here
+      _taskList.insert(0, state.task);
+      _animatedList?.insertItem(0);
+      return;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<HomeBloc, HomeState>(
       listener: (context, state) {
-        // TODO: implement listener
         if (state is TaskCreatedState) {
           if (widget.type == TaskScreenType.done) {
             return;
@@ -38,6 +80,9 @@ class _TaskTypeScreenState extends State<TaskTypeScreen> with AutomaticKeepAlive
           //only update for undone and all
           _taskList.insert(0, state.task);
           _animatedList?.insertItem(0);
+        }
+        if (state is TaskTypeChangeState) {
+          _onReceiveTaskChangeState(state);
         }
       },
       child: MinSizeStretchColumn(
@@ -48,14 +93,19 @@ class _TaskTypeScreenState extends State<TaskTypeScreen> with AutomaticKeepAlive
             child: Text(
               "${widget.type.tabName} task(s)",
               textAlign: TextAlign.left,
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 20, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
             ),
           ),
           Expanded(
             child: AnimatedList(
               key: _listKey,
               itemBuilder: (context, index, animation) {
-                return Text(_taskList[index].title);
+                return TaskItemCell(
+                  task: _taskList[index],
+                  onToggleCheckBox: () {
+                    _onToggleCheckBox(_taskList[index]);
+                  },
+                );
               },
               initialItemCount: _taskList.length,
             ),
