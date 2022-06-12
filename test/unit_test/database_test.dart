@@ -3,7 +3,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:todo_manabie/module/di/di.dart';
 import 'package:todo_manabie/module/environment/environment_manager.dart';
 import 'package:todo_manabie/module/task_cruid/task_cruid.dart';
-import 'package:todo_manabie/main_testing.dart' as testing;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 /// Initialize sqflite for test.

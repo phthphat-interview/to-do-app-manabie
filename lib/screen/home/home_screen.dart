@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:todo_manabie/screen/about_me/about_me.dart';
 import 'package:todo_manabie/screen/home/popup/home_popup.dart';
 import 'package:todo_manabie/screen/home/sub_screen/task_screen_type.dart';
 import 'package:todo_manabie/screen/home/sub_screen/task_type_screen.dart';
@@ -47,7 +48,11 @@ class __HomeMainViewState extends State<_HomeMainView> {
         title: const Text("To do list"),
         actions: [
           IconButton(onPressed: _onPressCreate, icon: const Icon(Icons.add)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.person)),
+          IconButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => AboutMe()));
+              },
+              icon: const Icon(Icons.person)),
         ],
       ),
       body: SafeArea(

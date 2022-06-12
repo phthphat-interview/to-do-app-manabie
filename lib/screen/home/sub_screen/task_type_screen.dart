@@ -21,6 +21,7 @@ class _TaskTypeScreenState extends State<TaskTypeScreen> with AutomaticKeepAlive
   AnimatedListState? get _animatedList => _listKey.currentState;
 
   List<Task> _taskList = [];
+  final ValueNotifier<bool> _isListEmpty = ValueNotifier(true);
 
   late final _bloc = BlocProvider.of<HomeBloc>(context);
 
@@ -32,7 +33,12 @@ class _TaskTypeScreenState extends State<TaskTypeScreen> with AutomaticKeepAlive
       for (var _ in _taskList) {
         _animatedList?.insertItem(0);
       }
+      _triggerIsEmptyList();
     });
+  }
+
+  void _triggerIsEmptyList() {
+    _isListEmpty.value = _taskList.isEmpty;
   }
 
   void _onToggleCheckBox(Task task) async {
@@ -51,22 +57,26 @@ class _TaskTypeScreenState extends State<TaskTypeScreen> with AutomaticKeepAlive
         _taskList.insert(0, state.task);
         _animatedList?.insertItem(0);
       }
+      _triggerIsEmptyList();
       return;
     }
     if (widget.type.taskStatus != state.task.status) {
       //status change from here to other
       if (index != -1) {
         _taskList.removeAt(index);
-        _animatedList?.removeItem(index, (context, animation) => SizedBox());
+        _animatedList?.removeItem(index, (context, animation) => _buildRemove(animation, state.task));
       }
-      return;
     }
     if (widget.type.taskStatus == state.task.status) {
       //status change from other to here
       _taskList.insert(0, state.task);
       _animatedList?.insertItem(0);
-      return;
     }
+    _triggerIsEmptyList();
+  }
+
+  Widget _buildRemove(Animation<double> animation, Task task) {
+    return FadeTransition(opacity: animation, child: TaskItemCell(task: task));
   }
 
   @override
@@ -97,17 +107,36 @@ class _TaskTypeScreenState extends State<TaskTypeScreen> with AutomaticKeepAlive
             ),
           ),
           Expanded(
-            child: AnimatedList(
-              key: _listKey,
-              itemBuilder: (context, index, animation) {
-                return TaskItemCell(
-                  task: _taskList[index],
-                  onToggleCheckBox: () {
-                    _onToggleCheckBox(_taskList[index]);
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                AnimatedList(
+                  key: _listKey,
+                  itemBuilder: (context, index, animation) {
+                    return TaskItemCell(
+                      task: _taskList[index],
+                      onToggleCheckBox: () {
+                        _onToggleCheckBox(_taskList[index]);
+                      },
+                    );
                   },
-                );
-              },
-              initialItemCount: _taskList.length,
+                  initialItemCount: _taskList.length,
+                ),
+                ValueListenableBuilder<bool>(
+                  valueListenable: _isListEmpty,
+                  builder: (context, isEmpty, child) {
+                    return Visibility(visible: isEmpty, child: child!);
+                  },
+                  child: MinSizeStretchColumn(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.airline_seat_individual_suite_rounded, size: 50),
+                      SizedBox(height: 10),
+                      Text("There are no task here"),
+                    ],
+                  ),
+                )
+              ],
             ),
           ),
         ],
