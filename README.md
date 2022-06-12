@@ -1,16 +1,33 @@
-# todo_manabie
+# To do list (Manabie)
+Project use bloc architecture with business logic in bloc, DAO and presentation. App also uses `GetIt` for dependency injection and `SQLite` for database (via `sqflite` plugin)
+## How to run the code
+The project is quite small, so it's simple to run (just follow the official Flutter doc)
+- Firstly, install all packages needed for opening app
+```sh
+flutter pub get
+```
 
-A new Flutter project.
+- Finally, run it with your destination device or simulator
+```sh
+flutter run
+```
 
-## Getting Started
+>Note: The project was written in Visual Studio Code, I have config the the needed file in `.vscode`, you can run the app by press `F5`
 
-This project is a starting point for a Flutter application.
+## How to run unit test case
+App unit test have database test and business test. You can run all the unit test by:
+```sh
+flutter test test/unit_test
+```
+Or run seperately:
+```sh
+flutter test test/unit_test/database_test.dart
+flutter test test/unit_test/business_test.dart
+```
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+*If you want a short command line for testing, please install [`Make`](https://formulae.brew.sh/formula/make). Run the test cases will use one of those commands:
+```
+make unit_test
+make db_test
+make business_test
+```

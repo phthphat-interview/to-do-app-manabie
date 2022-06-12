@@ -19,19 +19,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     try {
       final taskCreated = await _taskDAO.create(event.task);
       emit(TaskCreatedState(taskCreated));
-    } catch (e) {}
+      emit(const HomeShowBottomMessageState("Task created"));
+    } catch (e) {
+      emit(const HomeShowBottomMessageState("Problem when creating task"));
+    }
   }
 
   void _onChangeTaskType(TaskTypeChangeEvent event, Emitter<HomeState> emit) async {
     try {
       var task = event.task;
-      task.status = task.status == TaskStatus.done ? TaskStatus.notDone : TaskStatus.done;
+      task.toggleStatus();
       final taskUpdated = await _taskDAO.updateCustomCol(event.task.id, {
         Task.statusCol: task.status.value,
       });
       emit(TaskTypeChangeState(taskUpdated));
+      emit(HomeShowBottomMessageState("Task \"${task.title}\" status changed"));
     } catch (e) {
-      print(e);
+      emit(const HomeShowBottomMessageState("Problem when changing task status"));
     }
   }
 

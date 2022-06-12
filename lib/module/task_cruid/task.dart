@@ -10,6 +10,10 @@ class Task extends Equatable {
 
   Task({this.id = -1, required this.title, this.description, this.status = TaskStatus.notDone});
 
+  void toggleStatus() {
+    status = status == TaskStatus.notDone ? TaskStatus.done : TaskStatus.notDone;
+  }
+
   static Task fromJson(Map<String, dynamic> json) {
     return Task(
       id: json["id"],

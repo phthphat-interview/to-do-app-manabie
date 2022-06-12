@@ -15,3 +15,8 @@ class TaskTypeChangeState implements HomeState {
 
   const TaskTypeChangeState(this.task);
 }
+
+class HomeShowBottomMessageState implements HomeState {
+  final String message;
+  const HomeShowBottomMessageState(this.message);
+}

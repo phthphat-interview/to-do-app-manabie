@@ -43,42 +43,49 @@ class __HomeMainViewState extends State<_HomeMainView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("To do list"),
-        actions: [
-          IconButton(onPressed: _onPressCreate, icon: const Icon(Icons.add)),
-          IconButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => AboutMe()));
-              },
-              icon: const Icon(Icons.person)),
-        ],
-      ),
-      body: SafeArea(
-        child: PageView.builder(
-          controller: _pageController,
-          itemBuilder: (context, index) => TaskTypeScreen(type: _allTabs[index]),
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _allTabs.length,
+    return BlocListener<HomeBloc, HomeState>(
+      listener: (context, state) {
+        if (state is HomeShowBottomMessageState) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("To do list"),
+          actions: [
+            IconButton(onPressed: _onPressCreate, icon: const Icon(Icons.add)),
+            IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => AboutMe()));
+                },
+                icon: const Icon(Icons.person)),
+          ],
         ),
-      ),
-      bottomNavigationBar: ValueListenableBuilder<TaskScreenType>(
-        valueListenable: _currentTab,
-        builder: (context, type, child) {
-          return BottomNavigationBar(
-            currentIndex: type.tabOrdinal,
-            onTap: (index) {
-              _currentTab.value = _allTabs[index];
-              _pageController.jumpToPage(index);
-            },
-            items: _allTabs
-                .map(
-                  (e) => BottomNavigationBarItem(icon: e.tabIcon, label: e.tabName),
-                )
-                .toList(),
-          );
-        },
+        body: SafeArea(
+          child: PageView.builder(
+            controller: _pageController,
+            itemBuilder: (context, index) => TaskTypeScreen(type: _allTabs[index]),
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _allTabs.length,
+          ),
+        ),
+        bottomNavigationBar: ValueListenableBuilder<TaskScreenType>(
+          valueListenable: _currentTab,
+          builder: (context, type, child) {
+            return BottomNavigationBar(
+              currentIndex: type.tabOrdinal,
+              onTap: (index) {
+                _currentTab.value = _allTabs[index];
+                _pageController.jumpToPage(index);
+              },
+              items: _allTabs
+                  .map(
+                    (e) => BottomNavigationBarItem(icon: e.tabIcon, label: e.tabName),
+                  )
+                  .toList(),
+            );
+          },
+        ),
       ),
     );
   }
