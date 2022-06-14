@@ -26,7 +26,7 @@ flutter test test/unit_test/business_test.dart
 ```
 
 *Note you can run unit test with [`Make`](https://formulae.brew.sh/formula/make). Run one of the following commands:
-```
+```sh
 make unit_test #run all the unittest cases
 make db_test
 make business_test
