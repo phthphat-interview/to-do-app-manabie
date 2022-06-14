@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:todo_manabie/module/di/di.dart';
 import 'package:todo_manabie/module/environment/environment_manager.dart';
 import 'package:todo_manabie/module/task_cruid/task_cruid.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:todo_manabie/screen/home/sub_screen/task_screen_type.dart';
 
 /// Initialize sqflite for test.
 void sqfliteTestInit() {
@@ -67,6 +70,20 @@ void main() {
       createdTask.title = "7 vien ngoc rong";
       expect(() async => await taskDAO.update(createdTask), returnsNormally);
     }, returnsNormally);
+  });
+
+  test("Update from incomplete to complete and reverse", () async {
+    await taskDAO.deleteAll(); //make task table empty
+
+    var task = Task(title: "Feed the chicken", description: "Except the biggest one");
+    var insertedTask = await taskDAO.create(task);
+    var allIncompleteTasks = await taskDAO.getAll(TaskScreenType.notDone);
+    expect(allIncompleteTasks.length, 1);
+
+    insertedTask.toggleStatus();
+    await taskDAO.update(insertedTask);
+    var allDoneTasks = await taskDAO.getAll(TaskScreenType.done);
+    expect(allDoneTasks.length, 1);
   });
 
   tearDownAll(() {

@@ -25,9 +25,9 @@ flutter test test/unit_test/database_test.dart
 flutter test test/unit_test/business_test.dart
 ```
 
-*If you want a short command line for testing, please install [`Make`](https://formulae.brew.sh/formula/make). Run the test cases will use one of those commands:
+*Note you can run unit test with [`Make`](https://formulae.brew.sh/formula/make). Run one of the following commands:
 ```
-make unit_test
+make unit_test #run all the unittest cases
 make db_test
 make business_test
 ```
